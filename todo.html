@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager | KOTHA DEEPAK REDDY</title>
+  <style>
+    :root {
+      --ffM: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --sp1: 0.5rem;
+      --sp2: 1rem;
+      --sp3: 2rem;
+      --br1: 8px;
+      --tr1: all 0.3s ease;
+      --bgC: #f8f9fa;
+      --shC: #ffffff;
+      --txP: #212529;
+      --txS: #495057;
+      --acC: #0066cc;
+      --bdC: #dee2e6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bgC: #121212;
+        --shC: #1e1e1e;
+        --txP: #e0e0e0;
+        --txS: #a0a0a0;
+        --acC: #66b2ff;
+        --bdC: #2d2d2d;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--ffM);
+      background-color: var(--bgC);
+      color: var(--txP);
+      line-height: 1.6;
+      padding: var(--sp2);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: var(--tr1);
+    }
+
+    header {
+      background-color: var(--shC);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      padding: var(--sp2) var(--sp3);
+      margin-bottom: var(--sp3);
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: var(--sp3);
+      justify-content: flex-end;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--txS);
+      font-weight: 600;
+      transition: var(--tr1);
+    }
+
+    nav a:hover, 
+    nav a[aria-current="page"] {
+      color: var(--acC);
+    }
+
+    #mnC {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp3);
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    section {
+      background-color: var(--shC);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      padding: var(--sp3);
+    }
+
+    h1 {
+      color: var(--txP);
+      margin-bottom: var(--sp2);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp2);
+      max-width: 500px;
+    }
+
+    form div {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp1);
+    }
+
+    input {
+      font-family: var(--ffM);
+      padding: var(--sp2);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      background-color: var(--shC);
+      color: var(--txP);
+      font-size: 1rem;
+      transition: var(--tr1);
+    }
+
+    input:focus {
+      outline: 2px solid var(--acC);
+      outline-offset: 2px;
+    }
+
+    button {
+      font-family: var(--ffM);
+      background-color: var(--acC);
+      color: #ffffff;
+      border: none;
+      padding: var(--sp2);
+      border-radius: var(--br1);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--tr1);
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:focus {
+      outline: 2px solid var(--txP);
+      outline-offset: 2px;
+    }
+
+    footer {
+      text-align: center;
+      padding: var(--sp3) var(--sp2);
+      color: var(--txS);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <nav role="navigation" aria-label="Main menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="mnC" role="main">
+    <section aria-labelledby="tdH">
+      <h1 id="tdH">Task Manager</h1>
+      
+      <form id="tdF" aria-label="Add new task">
+        <div>
+          <input type="text" id="tIn" placeholder="What needs to be done?" required aria-required="true">
+        </div>
+        <button type="submit">Add Task</button>
+      </form>
+
+      <div id="tFl" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+        <button data-filter="all" class="active">All</button>
+        <button data-filter="active">Active</button>
+        <button data-filter="completed">Completed</button>
+      </div>
+
+      <ul id="tLs" style="list-style: none; margin-top: 1.5rem; padding: 0;">
+      </ul>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2026 KOTHA DEEPAK REDDY</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('tdF');
+      const input = document.getElementById('tIn');
+      const list = document.getElementById('tLs');
+      const filters = document.getElementById('tFl');
+
+      let tasks = JSON.parse(localStorage.getItem('kdr_tasks')) || [];
+      let currentFilter = 'all';
+
+      const saveAndRender = () => {
+        localStorage.setItem('kdr_tasks', JSON.stringify(tasks));
+        renderTasks();
+      };
+
+      const addTask = (text) => {
+        const newTask = {
+          id: Date.now().toString(),
+          text: text,
+          completed: false
+        };
+        tasks.push(newTask);
+        saveAndRender();
+      };
+
+      const toggleTask = (id) => {
+        tasks = tasks.map(task => 
+          task.id === id ? { ...task, completed: !task.completed } : task
+        );
+        saveAndRender();
+      };
+
+      const deleteTask = (id) => {
+        tasks = tasks.filter(task => task.id !== id);
+        saveAndRender();
+      };
+
+      const renderTasks = () => {
+        list.innerHTML = '';
+
+        const filteredTasks = tasks.filter(task => {
+          if (currentFilter === 'active') return !task.completed;
+          if (currentFilter === 'completed') return task.completed;
+          return true;
+        });
+
+        filteredTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.dataset.id = task.id;
+          li.style.display = 'flex';
+          li.style.justifyContent = 'space-between';
+          li.style.alignItems = 'center';
+          li.style.padding = '0.75rem';
+          li.style.borderBottom = '1px solid var(--bdC)';
+          li.style.backgroundColor = 'var(--shC)';
+          
+          const textStyle = task.completed ? 'text-decoration: line-through; opacity: 0.6;' : '';
+
+          li.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem; ${textStyle}">
+              <input type="checkbox" class="tgl-btn" ${task.completed ? 'checked' : ''} aria-label="Toggle completion">
+              <span>${task.text}</span>
+            </div>
+            <button class="del-btn" style="background: transparent; color: red; padding: 0.25rem 0.5rem;">X</button>
+          `;
+          
+          list.appendChild(li);
+        });
+      };
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (text) {
+          addTask(text);
+          input.value = '';
+        }
+      });
+
+      list.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        
+        const id = li.dataset.id;
+
+        if (e.target.classList.contains('tgl-btn')) {
+          toggleTask(id);
+        } else if (e.target.classList.contains('del-btn')) {
+          deleteTask(id);
+        }
+      });
+
+      filters.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+          document.querySelectorAll('#tFl button').forEach(btn => btn.style.opacity = '0.5');
+          e.target.style.opacity = '1';
+          
+          currentFilter = e.target.dataset.filter;
+          renderTasks();
+        }
+      });
+
+      renderTasks();
+    });
+  </script>
+</body>
+</html>
