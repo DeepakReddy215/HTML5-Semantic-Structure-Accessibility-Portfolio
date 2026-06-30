@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard | KOTHA DEEPAK REDDY</title>
+  <style>
+    :root {
+      --ffM: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --sp1: 0.5rem;
+      --sp2: 1rem;
+      --sp3: 2rem;
+      --br1: 8px;
+      --tr1: all 0.3s ease;
+      --bgC: #f8f9fa;
+      --shC: #ffffff;
+      --txP: #212529;
+      --txS: #495057;
+      --acC: #0066cc;
+      --bdC: #dee2e6;
+      --err: #dc3545;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bgC: #121212;
+        --shC: #1e1e1e;
+        --txP: #e0e0e0;
+        --txS: #a0a0a0;
+        --acC: #66b2ff;
+        --bdC: #2d2d2d;
+        --err: #ff6b6b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--ffM);
+      background-color: var(--bgC);
+      color: var(--txP);
+      line-height: 1.6;
+      padding: var(--sp2);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: var(--tr1);
+    }
+
+    header {
+      background-color: var(--shC);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      padding: var(--sp2) var(--sp3);
+      margin-bottom: var(--sp3);
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: var(--sp3);
+      justify-content: flex-end;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--txS);
+      font-weight: 600;
+      transition: var(--tr1);
+    }
+
+    nav a:hover, 
+    nav a[aria-current="page"] {
+      color: var(--acC);
+    }
+
+    #mnC {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp3);
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    section {
+      background-color: var(--shC);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      padding: var(--sp3);
+    }
+
+    h1 {
+      color: var(--txP);
+      margin-bottom: var(--sp2);
+    }
+
+    form {
+      display: flex;
+      gap: var(--sp2);
+      margin-bottom: var(--sp3);
+    }
+
+    form div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      font-family: var(--ffM);
+      padding: var(--sp2);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      background-color: var(--bgC);
+      color: var(--txP);
+      font-size: 1rem;
+      transition: var(--tr1);
+      width: 100%;
+    }
+
+    input:focus {
+      outline: 2px solid var(--acC);
+      outline-offset: 2px;
+    }
+
+    button {
+      font-family: var(--ffM);
+      background-color: var(--acC);
+      color: #ffffff;
+      border: none;
+      padding: var(--sp2) var(--sp3);
+      border-radius: var(--br1);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--tr1);
+      white-space: nowrap;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .wCard {
+      background-color: var(--bgC);
+      border: 1px solid var(--bdC);
+      border-radius: var(--br1);
+      padding: var(--sp3);
+      text-align: center;
+      display: none;
+    }
+
+    .wGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--sp2);
+      margin-top: var(--sp3);
+    }
+
+    .wStat {
+      background-color: var(--shC);
+      padding: var(--sp2);
+      border-radius: var(--br1);
+      border: 1px solid var(--bdC);
+    }
+
+    .wStat h3 {
+      font-size: 0.9rem;
+      color: var(--txS);
+      margin-bottom: var(--sp1);
+    }
+
+    .wStat p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--acC);
+    }
+
+    .errMsg {
+      color: var(--err);
+      background-color: rgba(220, 53, 69, 0.1);
+      padding: var(--sp2);
+      border-radius: var(--br1);
+      border: 1px solid var(--err);
+      margin-top: var(--sp2);
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: var(--sp3) var(--sp2);
+      color: var(--txS);
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <nav role="navigation" aria-label="Main menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="todo.html">Tasks</a></li>
+        <li><a href="weather.html" aria-current="page">Weather</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="mnC" role="main">
+    <section aria-labelledby="wthH">
+      <h1 id="wthH">Real-Time Weather Dashboard</h1>
+      
+      <form id="wFm" aria-label="Search city weather">
+        <div>
+          <label for="cIn" class="sr-only" style="display:none;">Enter City Name</label>
+          <input type="text" id="cIn" placeholder="e.g., Hyderabad, London, Tokyo" required aria-required="true">
+        </div>
+        <button type="submit" id="sBtn">Search</button>
+      </form>
+
+      <div id="errBx" class="errMsg" role="alert"></div>
+
+      <div id="wRes" class="wCard" aria-live="polite">
+        <h2 id="cName">City Name</h2>
+        <p id="cDesc" style="color: var(--txS);">Current Weather Conditions</p>
+        
+        <div class="wGrid">
+          <div class="wStat">
+            <h3>Temperature</h3>
+            <p id="tmpV">-- °C</p>
+          </div>
+          <div class="wStat">
+            <h3>Humidity</h3>
+            <p id="humV">-- %</p>
+          </div>
+          <div class="wStat">
+            <h3>Wind Speed</h3>
+            <p id="wndV">-- km/h</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2026 KOTHA DEEPAK REDDY</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('wFm');
+      const input = document.getElementById('cIn');
+      const btn = document.getElementById('sBtn');
+      const resCard = document.getElementById('wRes');
+      const errBox = document.getElementById('errBx');
+      
+      const cName = document.getElementById('cName');
+      const tmpV = document.getElementById('tmpV');
+      const humV = document.getElementById('humV');
+      const wndV = document.getElementById('wndV');
+
+      // Using Open-Meteo API (No API Key Required for basic geocoding and weather)
+      const GEO_API = 'https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=';
+      const WTH_API = 'https://api.open-meteo.com/v1/forecast?current=temperature_2m,relative_humidity_2m,wind_speed_10m&latitude=';
+
+      const showError = (msg) => {
+        errBox.textContent = msg;
+        errBox.style.display = 'block';
+        resCard.style.display = 'none';
+      };
+
+      const hideError = () => {
+        errBox.style.display = 'none';
+      };
+
+      const fetchWeather = async (city) => {
+        try {
+          btn.textContent = 'Searching...';
+          btn.disabled = true;
+          hideError();
+
+          // 1. Fetch Coordinates based on City Name
+          const geoRes = await fetch(`${GEO_API}${encodeURIComponent(city)}`);
+          if (!geoRes.ok) throw new Error('Failed to connect to geocoding service.');
+          
+          const geoData = await geoRes.json();
+          if (!geoData.results || geoData.results.length === 0) {
+            throw new Error(`City "${city}" not found. Please try again.`);
+          }
+
+          const { latitude, longitude, name, country } = geoData.results[0];
+
+          // 2. Fetch Weather based on Coordinates
+          const wthRes = await fetch(`${WTH_API}${latitude}&longitude=${longitude}`);
+          if (!wthRes.ok) throw new Error('Failed to fetch weather data.');
+          
+          const wthData = await wthRes.json();
+          const current = wthData.current;
+
+          // 3. Update DOM
+          cName.textContent = `${name}, ${country}`;
+          tmpV.textContent = `${current.temperature_2m} °C`;
+          humV.textContent = `${current.relative_humidity_2m} %`;
+          wndV.textContent = `${current.wind_speed_10m} km/h`;
+
+          resCard.style.display = 'block';
+
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          btn.textContent = 'Search';
+          btn.disabled = false;
+        }
+      };
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const city = input.value.trim();
+        if (city) {
+          fetchWeather(city);
+        }
+      });
+      
+      // Optional: Auto-load default city on initial render
+      // fetchWeather('Hyderabad');
+    });
+  </script>
+</body>
+</html>
